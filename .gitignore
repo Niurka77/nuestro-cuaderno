@@ -1,0 +1,20 @@
+# Dependencias y artefactos
+node_modules/
+.wrangler/
+.firebase/
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+
+# Configuración local: contiene la clave de sincronización de quien lo usa.
+# Crea un copia con el nombre de ejemplo para tus propios valores.
+firebase-config.js

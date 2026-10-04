@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Escritorio · Vista previa</title>
+<style>
+  *{box-sizing:border-box; margin:0; padding:0;}
+  :root{
+    --crema:#FBF3E8;
+    --crema2:#F6E8D6;
+    --tinta:#4A3A2C;
+    --tinta2:#8A7360;
+    --mandarina:#F2944E;
+    --mandarina-f:#FBE0C4;
+    --fresa:#E96A7E;
+    --fresa-f:#FAD9DD;
+    --verde:#9BBE6E;
+    --verde-f:#E2EDD0;
+    --miel:#D9A441;
+    --miel-f:#F3E6C3;
+    --celeste:#7FA8B9;
+    --celeste-f:#D7E6EC;
+    --lila:#B9A7C9;
+    --lila-f:#E8E0EF;
+    --durazno:#EE8A45;
+    --durazno-f:#F9DDC6;
+    --rosa:#E9A0B4;
+    --rosa-f:#F6DCE4;
+    --blanco:#FFFDF9;
+    --sombra:0 10px 24px rgba(170,120,60,.14), 0 3px 8px rgba(170,120,60,.10);
+    --soft:0 4px 14px rgba(180,130,80,.12);
+    --borde:1.5px solid rgba(200,160,120,.22);
+    --r:22px;
+    --fondo:var(--crema);
+    --fuente:'Segoe UI', 'Trebuchet MS', Verdana, sans-serif;
+  }
+  html,body{height:100%;}
+  body{
+    font-family:var(--fuente);
+    background:var(--fondo);
+    color:var(--tinta);
+    overflow:hidden;
+  }
+  /* ---------- PAPEL TAPIZ ---------- */
+  .wallpaper{position:fixed; inset:0; z-index:0; pointer-events:none; background:
+    radial-gradient(circle at 8% 12%, rgba(242,148,78,.16), transparent 34%),
+    radial-gradient(circle at 92% 8%, rgba(233,106,126,.14), transparent 30%),
+    radial-gradient(circle at 90% 90%, rgba(155,190,110,.14), transparent 34%),
+    radial-gradient(circle at 5% 95%, rgba(127,168,185,.14), transparent 30%),
+    linear-gradient(180deg,#FBEEDC 0%, var(--crema) 60%, #F7E9D7 100%);
+  }
+  .wallpaper::before{content:''; position:absolute; inset:0; opacity:.5;
+    background-image:radial-gradient(rgba(214,171,120,.18) 1px, transparent 1.5px);
+    background-size:26px 26px;}
+  .hoja{position:fixed; z-index:0; pointer-events:none; color:rgba(155,190,110,.35);}
+  .l1{left:-60px; bottom:-40px; transform:scale(1.6);}
+  .l2{right:-70px; top:-50px; transform:scale(1.9) rotate(180deg);}
+
+  /* ---------- BARRA SUPERIOR ---------- */
+  header.topbar{
+    position:relative; z-index:3;
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap;
+    padding:16px 22px 12px;
+  }
+  .marca h1{font-size:26px; font-weight:700; letter-spacing:.3px; display:flex; align-items:center; gap:10px;}
+  .marca h1 .punto{width:16px; height:16px; border-radius:6px; background:linear-gradient(135deg,var(--mandarina),var(--fresa)); box-shadow:var(--soft);}
+  .marca p{color:var(--tinta2); font-size:13px; margin-top:2px;}
+  .widgets{margin-left:auto; display:flex; gap:14px; align-items:stretch; flex-wrap:wrap;}
+
+  .wcard{
+    background:var(--blanco); border:var(--borde); border-radius:18px;
+    box-shadow:var(--soft); padding:10px 16px; min-width:150px;
+  }
+  .wcard .etq{font-size:11px; letter-spacing:.8px; text-transform:uppercase; color:var(--tinta2); font-weight:600;}
+  .wcard .val{font-size:22px; font-weight:700; line-height:1.2;}
+  .wcard .sub{font-size:12px; color:var(--tinta2);}
+  .wcard.reloj{min-width:118px;}
+  .wcard .hora{font-size:26px; font-variant-numeric:tabular-nums;}
+  .wcard.barra .pista{height:9px; border-radius:6px; background:var(--crema2); margin-top:8px; overflow:hidden;}
+  .wcard.barra .llenado{height:100%; width:0%; border-radius:6px; background:linear-gradient(90deg,var(--mandarina),var(--fresa)); transition:width .2s;}
+  .wcard.pronto{border-left:5px solid var(--fresa); min-width:230px;}
+  .wcard.pronto .val{font-size:15px; font-weight:600;}
+  .wcard.pronto .sub{font-size:11.5px;}
+
+  .acciones{display:flex; gap:8px; align-items:center;}
+  .btn{
+    font-family:var(--fuente); font-size:13px; font-weight:600;
+    color:var(--tinta); background:var(--blanco); border:var(--borde);
+    padding:9px 14px; border-radius:14px; cursor:pointer; box-shadow:var(--soft);
+    transition:transform .08s, box-shadow .12s; display:inline-flex; align-items:center; gap:7px;
+  }
+  .btn:hover{transform:translateY(-1px); box-shadow:var(--sombra);}
+  .btn:active{transform:translateY(0) scale(.98);}
+  .btn.activo{background:var(--mandarina-f); border-color:rgba(242,148,78,.5);}
+
+  .chips{position:relative; z-index:3; display:flex; gap:8px; padding:4px 22px 12px; flex-wrap:wrap;}
+  .chip{
+    font-size:12.5px; font-weight:600; color:var(--tinta2); background:var(--blanco);
+    border:var(--borde); padding:7px 13px; border-radius:99px; cursor:pointer;
+  }
+  .chip.on{background:var(--tinta); color:#fff; border-color:var(--tinta);}
+
+  /* ---------- LIENZO DE CARPETAS ---------- */
+  .canvas{
+    position:relative; z-index:2;
+    height:calc(100vh - 188px); width:100%;
+  }
+  .folder{
+    position:absolute; z-index:1; cursor:grab; user-select:none; touch-action:none;
+    background:var(--blanco); border:var(--borde); border-radius:22px;
+    box-shadow:var(--sombra); padding:14px 12px 12px;
+    width:170px; min-height:150px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:9px;
+    transition:box-shadow .12s, transform .12s;
+  }
+  .folder:active{cursor:grabbing;}
+  .folder:hover{box-shadow:0 14px 30px rgba(170,120,60,.20); transform:translateY(-2px);}
+  .folder.sel{outline:3px solid var(--tinta); outline-offset:3px;}
+  .folder .f-icon{
+    width:58px; height:58px; border-radius:18px; display:grid; place-items:center;
+    box-shadow:inset 0 -6px 10px rgba(0,0,0,.06);
+  }
+  .folder .f-icon svg{width:30px; height:30px; stroke:#fff; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .folder .f-name{font-weight:700; font-size:14px; text-align:center; line-height:1.15;}
+  .folder .f-note{font-size:11px; color:var(--tinta2); text-align:center;}
+  .folder:nth-child(odd){transform:rotate(-.5deg);}
+  .folder:nth-child(even){transform:rotate(.5deg);}
+  .folder:hover{transform:rotate(0deg) translateY(-2px);}
+  .folder .grip{position:absolute; top:8px; right:10px; font-size:10px; letter-spacing:1px; color:var(--tinta2); opacity:.7;}
+
+  /* ---------- PANEL PERSONALIZAR ---------- */
+  .panel{
+    position:fixed; top:0; right:0; bottom:0; width:300px; z-index:6;
+    background:var(--blanco); border-left:var(--borde); box-shadow:-10px 0 30px rgba(120,80,30,.12);
+    padding:18px; transform:translateX(105%); transition:transform .25s ease; overflow:auto;
+  }
+  .panel.abierto{transform:translateX(0);}
+  .panel h2{font-size:17px; margin-bottom:12px; display:flex; align-items:center; gap:8px;}
+  .panel .grp{margin-bottom:16px;}
+  .panel .grp > .t{font-size:11.5px; text-transform:uppercase; letter-spacing:.8px; color:var(--tinta2); font-weight:700; margin-bottom:8px;}
+  .swatches{display:flex; gap:9px; flex-wrap:wrap;}
+  .sw{width:30px; height:30px; border-radius:10px; cursor:pointer; border:2px solid #fff; box-shadow:var(--soft);}
+  .sw.on{border-color:var(--tinta);}
+  .iconos{display:grid; grid-template-columns:repeat(5,1fr); gap:7px;}
+  .ic{border:1.5px solid rgba(200,160,120,.3); border-radius:11px; cursor:pointer; height:44px; display:grid; place-items:center; background:#fff;}
+  .ic svg{width:22px; height:22px; stroke:var(--tinta); fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;}
+  .ic.on{border-color:var(--tinta); background:var(--crema);}
+  .tama{display:flex; gap:8px;}
+  .tama .btn{padding:7px 12px;}
+  input[type=range]{width:100%; accent-color:var(--mandarina);}
+  .nota{font-size:11.5px; color:var(--tinta2); line-height:1.45; background:var(--crema); border:var(--borde); border-radius:14px; padding:10px 12px;}
+  .panel .cerrar{position:absolute; top:12px; right:14px; background:none; border:none; font-size:20px; cursor:pointer; color:var(--tinta2);}
+
+  /* ---------- LISTA DE ORDEN SUGERIDA ---------- */
+  .sug{
+    position:fixed; top:70px; left:16px; z-index:5; width:300px; max-height:calc(100vh - 90px); overflow:auto;
+    background:var(--blanco); border:var(--borde); border-radius:20px; box-shadow:var(--sombra); padding:16px;
+    transform:translateX(-120%); transition:transform .25s ease;
+  }
+  .sug.abierto{transform:translateX(0);}
+  .sug h2{font-size:16px; margin-bottom:4px;}
+  .sug .sub{font-size:12px; color:var(--tinta2); margin-bottom:12px;}
+  .mapa{display:flex; flex-direction:column; gap:7px;}
+  .mapa .fila{display:flex; align-items:center; gap:9px; font-size:12.5px;}
+  .mapa .dot{width:11px; height:11px; border-radius:4px; flex:none;}
+  .mapa .ruta{color:var(--tinta2); font-size:10.5px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .mapa .cats{font-weight:700; min-width:64px;}
+
+  .fab{
+    position:fixed; z-index:5; bottom:22px; right:22px;
+    background:linear-gradient(135deg,var(--mandarina),var(--fresa)); color:#fff; border:none; border-radius:18px;
+    padding:14px 18px; font-family:var(--fuente); font-weight:700; font-size:14px; cursor:pointer;
+    box-shadow:0 10px 24px rgba(233,106,126,.35);
+  }
+  .fab:hover{transform:translateY(-2px);}
+
+  .barra-info{position:relative; z-index:3; padding:6px 22px 10px; font-size:11.5px; color:var(--tinta2); display:flex; gap:16px; flex-wrap:wrap;}
+  .barra-info b{color:var(--tinta);}
+</style>
+</head>
+<body>
+  <div class="wallpaper"></div>
+  <svg class="hoja l1" width="160" height="160" viewBox="0 0 160 160"><path d="M10 150 C40 110 60 60 55 15 C60 75 90 120 150 150 C100 150 60 150 10 150 Z" fill="currentColor"/><path d="M25 142 C50 108 66 66 62 30" stroke="#fff" stroke-width="4" fill="none" opacity=".5"/></svg>
+  <svg class="hoja l2" width="160" height="160" viewBox="0 0 160 160"><path d="M10 150 C40 110 60 60 55 15 C60 75 90 120 150 150 C100 150 60 150 10 150 Z" fill="currentColor"/><path d="M25 142 C50 108 66 66 62 30" stroke="#fff" stroke-width="4" fill="none" opacity=".5"/></svg>
+
+  <header class="topbar">
+    <div class="marca">
+      <h1><span class="punto"></span> Mi Escritorio</h1>
+      <p>Vista previa de diseño · organiza, pinta y mueve tus carpetas · se guarda sola</p>
+    </div>
+    <div class="widgets">
+      <div class="wcard reloj">
+        <div class="etq">Hora</div>
+        <div class="hora" id="hora">--:--</div>
+        <div class="sub" id="fecha">—</div>
+      </div>
+      <div class="wcard barra">
+        <div class="etq">Día</div>
+        <div class="val" id="pct">0%</div>
+        <div class="pista"><div class="llenado" id="llenado"></div></div>
+      </div>
+      <div class="wcard pronto">
+        <div class="etq">Próximo compromiso</div>
+        <div class="val"><span id="prox_txt">Entrevista · ARXUL</span></div>
+        <div class="sub" id="prox_sub">Viernes 11 sep · 2:35 pm · Meet</div>
+      </div>
+    </div>
+    <div class="acciones">
+      <button class="btn" id="btnSug">Orden sugerido</button>
+      <button class="btn" id="btnGrid">Cuadrícula</button>
+      <button class="btn" id="btnReset">Reiniciar</button>
+      <button class="btn" id="btnPers" style="background:linear-gradient(135deg,var(--mandarina),var(--fresa)); color:#fff; border:none;">Personalizar carpeta</button>
+    </div>
+  </header>
+
+  <div class="chips" id="chips">
+    <span class="chip on" data-cat="*">Todo</span>
+    <span class="chip" data-cat="agenda">Agenda</span>
+    <span class="chip" data-cat="empleo">Empleo</span>
+    <span class="chip" data-cat="cursos">Cursos</span>
+    <span class="chip" data-cat="estudios">Estudios</span>
+    <span class="chip" data-cat="finanzas">Finanzas</span>
+    <span class="chip" data-cat="familia">Familia</span>
+    <span class="chip" data-cat="proyectos">Proyectos</span>
+    <span class="chip" data-cat="herramientas">Herramientas</span>
+  </div>
+
+  <div class="canvas" id="canvas"></div>
+
+  <div class="barra-info" id="barraInfo"></div>
+
+  <aside class="sug" id="sug">
+    <h2>Orden sugerido</h2>
+    <div class="sub">Así se ordenarían tus carpetas y accesos actuales dentro del proyecto. La agrupación real se aplica cuando tú lo confirmes.</div>
+    <div class="mapa" id="mapa"></div>
+  </aside>
+
+  <aside class="panel" id="panel">
+    <button class="cerrar" id="cerrarPanel">×</button>
+    <h2>Carpeta seleccionada</h2>
+    <div class="nota" id="selInfo">Haz clic en una carpeta del escritorio para personalizarla.</div>
+    <div class="grp"><div class="t">Color</div><div class="swatches" id="swatches"></div></div>
+    <div class="grp"><div class="t">Ícono</div><div class="iconos" id="iconos"></div></div>
+    <div class="grp"><div class="t">Tamaño</div><div class="tama">
+      <button class="btn" data-sz="0.8">Pequeña</button>
+      <button class="btn" data-sz="1">Mediana</button>
+      <button class="btn" data-sz="1.25">Grande</button>
+    </div></div>
+    <div class="grp"><div class="t">Esquinas redondeadas</div><input type="range" id="rngRound" min="6" max="28" value="22"></div>
+    <div class="nota">Arrastra la carpeta para colocarla donde quieras. Todo se guarda automáticamente en este navegador.</div>
+  </aside>
+
+  <button class="fab" id="fab">Guardaré todo lo que cambies</button>
+
+<script>
+const CATS = {
+  agenda:{nombre:'Agenda', color:'#F2944E', claro:'#FBE0C4', icono:'calendario'},
+  empleo:{nombre:'Empleo', color:'#E96A7E', claro:'#FAD9DD', icono:'maletin'},
+  cursos:{nombre:'Cursos', color:'#EE8A45', claro:'#F9DDC6', icono:'pizarra'},
+  estudios:{nombre:'Estudios', color:'#9BBE6E', claro:'#E2EDD0', icono:'birrete'},
+  finanzas:{nombre:'Finanzas', color:'#D9A441', claro:'#F3E6C3', icono:'moneda'},
+  familia:{nombre:'Familia', color:'#E9A0B4', claro:'#F6DCE4', icono:'corazon'},
+  proyectos:{nombre:'Proyectos', color:'#7FA8B9', claro:'#D7E6EC', icono:'cohete'},
+  herramientas:{nombre:'Herramientas', color:'#B9A7C9', claro:'#E8E0EF', icono:'llave'},
+};
+
+const CARPETAS = [
+  {id:'agenda_planner',  nombre:'Agenda',              nota:'planner',              cat:'agenda'},
+  {id:'empleo_proyecto', nombre:'Empleo y postulaciones', nota:'Default Project',   cat:'empleo'},
+  {id:'empleo_seg',      nombre:'Entrevistas y guiones', nota:'Seguimiento / Perfil', cat:'empleo'},
+  {id:'cursos_excel',    nombre:'Excel e IA',          nota:'CURSO_EXCEL',          cat:'cursos'},
+  {id:'cursos_bit',      nombre:'Python (BIT)',        nota:'CURSO_EXCEL_BIT',      cat:'cursos'},
+  {id:'estudios_pronabec',nombre:'PRONABEC',           nota:'PRONABEC',             cat:'estudios'},
+  {id:'finanzas_panel',  nombre:'Panel de archivos',   nota:'acceso directo',       cat:'finanzas'},
+  {id:'familia_personal',nombre:'Familia y trámites',  nota:'PERSONAL',             cat:'familia'},
+  {id:'proyectos_tienda',nombre:'Tienda don karl',     nota:'don-karl-tienda',      cat:'proyectos'},
+  {id:'proyectos_kiva',  nombre:'Marca Kilié',         nota:'Kivastudio',           cat:'proyectos'},
+  {id:'proyectos_heritage',nombre:'Heritage detector', nota:'HeritageDetector',     cat:'proyectos'},
+  {id:'proyectos_copiar',nombre:'Plantillas para copiar', nota:'PROYECTOS PARA COPIAR', cat:'proyectos'},
+  {id:'herramientas_office',nombre:'Office',           nota:'office',               cat:'herramientas'},
+  {id:'herramientas_ide',nombre:'Editor de código',    nota:'Visual Studio Code',   cat:'herramientas'},
+  {id:'herramientas_web',nombre:'Diseño online',       nota:'Photopea',             cat:'herramientas'},
+];
+
+const ICONOS = {
+  calendario:'<path d="M5 8h14M9 4v4m6-4v4M5 5h14v15H5z"/><path d="M5 12h14"/>',
+  maletin:'<rect x="4" y="7" width="16" height="13" rx="2"/><path d="M10 7V5a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2"/><path d="M4 12h16"/>',
+  pizarra:'<rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 12l3-3 2 2 4-4"/><path d="M12 17v3m-4 0h8"/>',
+  birrete:'<path d="M3 10l9-5 9 5-9 5z"/><path d="M7 12.5V16c0 1.7 2.2 3 5 3s5-1.3 5-3v-3.5"/><path d="M21 10v5"/>',
+  moneda:'<circle cx="12" cy="12" r="8"/><path d="M12 7v10M15.5 9.5c-.7-1-2-1.5-3.5-1.5-1.8 0-3 1-3 2.2 0 2.6 7 1.1 7 3.6 0 1.2-1.2 2.1-3 2.1-1.5 0-2.8-.5-3.5-1.5"/>',
+  corazon:'<path d="M12 20s-7-4.4-9-8.5C1.5 8 3.5 5 6.5 5c2 0 3.4 1.2 4 2.4L12 9l1.5-1.6C14.1 6.2 15.5 5 17.5 5c3 0 5 3 3.5 6.5C19 15.6 12 20 12 20z"/>',
+  cohete:'<path d="M12 3c4 1 6.5 4 7 9l-4 1-3 5-2-1-1-3-3-1 1-4z"/><path d="M12 3c-3 2-4 5-4.5 8.5"/><circle cx="12" cy="7" r="1.6"/><path d="M6 21c1.5-1 4-1.5 6-1"/>',
+  llave:'<path d="M14.5 6.5a4.5 4.5 0 1 1 .5 2.8L12 12l3 3-2 2-3-3-2.5 2.5H5v-2.5z"/><path d="M15 6h.01"/>',
+  casa:'<path d="M4 11l8-6.5L20 11v8.5H4z"/><path d="M9 19.5V13h6v6.5"/>',
+  documento:'<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5m-5 4h5"/>',
+  red:'<circle cx="12" cy="5" r="2"/><circle cx="5" cy="18" r="2"/><circle cx="19" cy="18" r="2"/><path d="M10.2 6.5L6 16.2M13.8 6.5L18 16.2M7 18h10"/>',
+  lupa:'<circle cx="11" cy="11" r="6"/><path d="M20 20l-4-4"/>',
+  gaveta:'<path d="M4 6h16M4 12h16M4 18h16"/><path d="M6 6v12m12-12v12" opacity="0"/>',
+  rayo:'<path d="M13 3L5 13h5l-1 8 8-11h-5z"/>',
+  libro:'<path d="M4 19V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zm0 0a2 2 0 0 0 2 2h12v-2"/><path d="M14 5h2"/>',
+};
+
+const ALMACEN = 'mi_escritorio_v1';
+let store = {pos:{}, estilo:{}, orden:[]};
+try{ store = Object.assign(store, JSON.parse(localStorage.getItem(ALMACEN)||'{}')); }catch(e){}
+
+const canvas = document.getElementById('canvas');
+const chipBar = document.getElementById('chips');
+let filtro = '*';
+let seleccion = null;
+
+function svgIcono(nombre, color){
+  const p = ICONOS[nombre]||ICONOS.carpeta;
+  return '<svg viewBox="0 0 24 24">'+p+'</svg>';
+}
+
+function dibujar() {
+  canvas.innerHTML = '';
+  CARPETAS.forEach((c, idx) => {
+    const cat = CATS[c.cat];
+    const es = store.estilo[c.id]||{};
+    const color = es.color || cat.color;
+    const icono = es.icono || cat.icono;
+    const sz = es.sz || 1;
+    const r = es.round != null ? es.round : 22;
+    const el = document.createElement('div');
+    el.className = 'folder'+(filtro!=='*'&&c.cat!==filtro?' oculta':'');
+    el.dataset.id = c.id;
+    el.dataset.cat = c.cat;
+    if(filtro!=='*'&&c.cat!==filtro){ el.style.display='none'; }
+    else { el.style.display=''; }
+    el.style.width = Math.round(170*sz)+'px';
+    el.style.minHeight = Math.round(150*sz)+'px';
+    el.style.borderRadius = r+'px';
+    el.style.transform = idx%2? 'rotate(-.5deg)':'rotate(.5deg)';
+    el.innerHTML =
+      '<span class="grip">ARRAN</span>'+
+      '<div class="f-icon" style="background:linear-gradient(135deg,'+color+','+color+'cc); width:'+Math.round(58*sz)+'px; height:'+Math.round(58*sz)+'px; border-radius:'+r+'px;">'+svgIcono(icono,color)+'</div>'+
+      '<div class="f-name" style="font-size:'+Math.round(14*sz)+'px;">'+c.nombre+'</div>'+
+      '<div class="f-note" style="font-size:'+Math.round(11*sz)+'px;">'+c.nota+'</div>';
+    const p = store.pos[c.id];
+    const rx = canvas.clientWidth/2, ry = canvas.clientHeight/2;
+    const x = p!=null? p.x : rx + ((idx*200) % Math.max(1,Math.floor(rx*1.8)) ) - rx*0.7;
+    const y = p!=null? p.y : 26 + Math.floor(idx/6)*(Math.round(176*sz)+14);
+    el.style.left = x+'px'; el.style.top = y+'px';
+    hacerArrastrable(el, x, y);
+    el.addEventListener('click', (e)=>{ if(e._dragged) return; seleccionar(el, c); });
+    canvas.appendChild(el);
+  });
+}
+
+function hacerArrastrable(el, x0, y0){
+  let arr = false, ox=0, oy=0;
+  el.addEventListener('pointerdown', (e)=>{
+    arr=true; ox=e.clientX; oy=e.clientY; el.setPointerCapture(e.pointerId);
+    el.style.zIndex = 5;
+  });
+  el.addEventListener('pointermove', (e)=>{
+    if(!arr) return;
+    const dx=e.clientX-ox, dy=e.clientY-oy;
+    ox=e.clientX; oy=e.clientY;
+    let x = (parseFloat(el.style.left)||0)+dx;
+    let y = (parseFloat(el.style.top)||0)+dy;
+    if(document.getElementById('btnGrid').classList.contains('activo')){ x=Math.round(x/20)*20; y=Math.round(y/20)*20; }
+    el.style.left=x+'px'; el.style.top=y+'px';
+    el.addEventListener('pointerup', ()=>e._dragged=true);
+  });
+  el.addEventListener('pointerup', (e)=>{
+    e._dragged=true;
+    arr=false; el.style.zIndex=1;
+    store.pos[el.dataset.id] = {x:parseFloat(el.style.left), y:parseFloat(el.style.top)};
+    guardar();
+    setTimeout(()=>{ e._dragged=false; }, 120);
+  });
+  el.addEventListener('pointercancel', ()=>{ arr=false; });
+}
+
+function guardar(){ try{ localStorage.setItem(ALMACEN, JSON.stringify(store)); }catch(e){} }
+
+function seleccionar(el, c){
+  document.querySelectorAll('.folder').forEach(f=>f.classList.remove('sel'));
+  el.classList.add('sel'); seleccion = el; el.style.zIndex=5;
+  const cat = CATS[c.cat];
+  const es = store.estilo[c.id]||{};
+  document.getElementById('selInfo').innerHTML = '<b>'+c.nombre+'</b><br><span style="color:var(--tinta2); font-size:12px;">'+cat.nombre+' · '+c.nota+'</span>';
+  pintaControles();
+  document.getElementById('panel').classList.add('abierto');
+}
+
+function pintaControles(){
+  if(!seleccion) return;
+  const id = seleccion.dataset.id, c = CARPETAS.find(x=>x.id===id);
+  const cat = CATS[c.cat], es = store.estilo[id]||{};
+  const sw = document.getElementById('swatches'); sw.innerHTML='';
+  Object.keys(CATS).forEach(k=>{
+    const col = CATS[k].color;
+    const b=document.createElement('div'); b.className='sw'+( (es.color||cat.color)===col?' on':''); b.style.background=col;
+    b.addEventListener('click',()=>{ store.estilo[id]=Object.assign({},store.estilo[id],{color:col}); guardar(); dibujar(); seleccionar(seleccion,c); });
+    sw.appendChild(b);
+  });
+  const ic = document.getElementById('iconos'); ic.innerHTML='';
+  Object.keys(ICONOS).forEach(n=>{
+    const b=document.createElement('button'); b.className='ic'+( (es.icono||cat.icono)===n?' on':'');
+    b.innerHTML=svgIcono(n); b.title=n;
+    b.addEventListener('click',()=>{ store.estilo[id]=Object.assign({},store.estilo[id],{icono:n}); guardar(); dibujar(); seleccionar(seleccion,c); });
+    ic.appendChild(b);
+  });
+  document.getElementById('rngRound').value = es.round!=null? es.round : 22;
+  document.querySelectorAll('.tama .btn').forEach(bn=>{
+    bn.classList.toggle('activo', (es.sz||1)==parseFloat(bn.dataset.sz));
+  });
+}
+
+document.getElementById('rngRound').addEventListener('input',(e)=>{
+  if(!seleccion) return;
+  const id = seleccion.dataset.id, c = CARPETAS.find(x=>x.id===id);
+  store.estilo[id]=Object.assign({},store.estilo[id],{round:parseInt(e.target.value)}); guardar(); dibujar(); seleccionar(seleccion,c);
+});
+document.querySelectorAll('.tama .btn').forEach(bn=>{
+  bn.addEventListener('click',()=>{
+    if(!seleccion) return;
+    const id = seleccion.dataset.id, c = CARPETAS.find(x=>x.id===id);
+    store.estilo[id]=Object.assign({},store.estilo[id],{sz:parseFloat(bn.dataset.sz)}); guardar(); dibujar(); seleccionar(seleccion,c);
+  });
+});
+
+chipBar.addEventListener('click',(e)=>{
+  const ch = e.target.closest('.chip'); if(!ch) return;
+  document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+  ch.classList.add('on'); filtro = ch.dataset.cat; dibujar();
+});
+
+document.getElementById('btnSug').addEventListener('click',()=>document.getElementById('sug').classList.toggle('abierto'));
+document.getElementById('btnGrid').addEventListener('click',()=>{ document.getElementById('btnGrid').classList.toggle('activo'); });
+document.getElementById('btnReset').addEventListener('click',()=>{ if(confirm('Restablecer posiciones y estilos?')){ store={pos:{},estilo:{},orden:[]}; guardar(); dibujar(); } });
+document.getElementById('btnPers').addEventListener('click',()=>{ document.getElementById('sug').classList.remove('abierto'); document.getElementById('panel').classList.add('abierto'); });
+document.getElementById('cerrarPanel').addEventListener('click',()=>document.getElementById('panel').classList.remove('abierto'));
+document.getElementById('fab').addEventListener('click',()=>{ document.getElementById('sug').classList.toggle('abierto'); });
+
+// ---- mapa de orden sugerido ----
+(()=>{
+  const mapa = document.getElementById('mapa');
+  CARPETAS.slice(0,11).forEach(c=>{
+    const cat=CATS[c.cat];
+    const f=document.createElement('div'); f.className='fila';
+    f.innerHTML = '<span class="dot" style="background:'+cat.color+'"></span><span class="cats">'+cat.nombre+'</span><span class="ruta">'+c.nota+'</span>';
+    mapa.appendChild(f);
+  });
+})();
+
+// ---- reloj y progreso ----
+function tick(){
+  const ahora = new Date();
+  document.getElementById('hora').textContent = ahora.toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit'});
+  const f = ahora.toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('fecha').textContent = f.charAt(0).toUpperCase()+f.slice(1);
+  const ms = (ahora.getHours()*3600+ahora.getMinutes()*60+ahora.getSeconds())*1000;
+  const pct = Math.round(ms/86400000*100);
+  document.getElementById('pct').textContent = pct+'%';
+  document.getElementById('llenado').style.width = pct+'%';
+}
+tick(); setInterval(tick,1000);
+
+// ---- barra de info inferior ----
+document.getElementById('barraInfo').innerHTML =
+  '<span><b>Agenda:</b> planner</span>'+
+  '<span><b>Empleo:</b> Default Project</span>'+
+  '<span><b>Cursos:</b> CURSO_EXCEL · CURSO_EXCEL_BIT</span>'+
+  '<span><b>Estudios:</b> PRONABEC</span>'+
+  '<span><b>Familia:</b> PERSONAL</span>'+
+  '<span><b>Proyectos:</b> don-karl-tienda · Kivastudio · HeritageDetector</span>';
+
+dibujar();
+</script>
+</body>
+</html>
