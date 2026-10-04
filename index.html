@@ -527,6 +527,60 @@
     border-radius:calc(var(--r)*.3);
   }
 
+  /* ---- Gastos ---- */
+  .g-form{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .g-form input, .g-form select{
+    background:var(--cell); border:none; padding:10px 12px; font-family:inherit; color:var(--ink);
+    border-radius:calc(var(--r)*.4); font-size:13px;
+  }
+  .g-form input.g-concepto{ flex:1 1 150px; }
+  .g-form input.g-monto{ flex:0 1 100px; }
+  .g-form select{ flex:0 1 130px; }
+  .g-form button{
+    background:var(--black); color:#fff; border:none; padding:10px 18px;
+    font-family:inherit; font-weight:700; font-size:13px; cursor:pointer;
+    border-radius:calc(var(--r)*.4);
+  }
+  .g-form button:hover{ background:var(--blue); }
+  .g-resumen{ display:flex; gap:10px; flex-wrap:wrap; margin:4px 0 16px; }
+  .g-card{
+    flex:1 1 120px; background:var(--cell); padding:12px 14px;
+    border-radius:calc(var(--r)*.4);
+  }
+  .g-card .g-label{ font-size:11px; letter-spacing:.06em; color:var(--muted); font-weight:700; }
+  .g-card .g-value{ font-size:20px; font-weight:800; color:var(--ink); margin-top:2px; }
+  .g-lista{ max-height:230px; overflow:auto; margin:0; padding:0; list-style:none; }
+  .g-lista li{
+    display:flex; align-items:center; gap:10px; padding:9px 4px;
+    border-bottom:1px solid var(--cell); font-size:13.5px; color:var(--ink);
+  }
+  .g-lista li:last-child{ border-bottom:none; }
+  .g-cat{
+    flex:0 0 auto; font-size:10.5px; font-weight:700; letter-spacing:.04em;
+    background:var(--sheet); color:var(--muted); padding:3px 7px;
+    border:1px solid var(--cell); border-radius:calc(var(--r)*.3);
+  }
+  .g-concepto-txt{ flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .g-monto-txt{ font-weight:800; font-variant-numeric:tabular-nums; }
+  .g-borrar{
+    flex:0 0 auto; background:none; border:none; color:var(--muted);
+    font-size:15px; cursor:pointer; padding:2px 4px; line-height:1;
+  }
+  .g-borrar:hover{ color:var(--black); }
+  .g-vacio{ font-size:12.5px; color:var(--muted); padding:10px 2px; }
+  .g-presup{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-top:14px; }
+  .g-presup label{ font-size:12px; color:var(--muted); font-weight:700; }
+  .g-presup input{
+    width:105px; background:var(--cell); border:none; padding:9px 11px;
+    font-family:inherit; color:var(--ink); border-radius:calc(var(--r)*.3); font-size:13px;
+  }
+  .g-presup .g-track{
+    flex:1 1 110px; height:8px; background:var(--cell); border-radius:99px; overflow:hidden;
+  }
+  .g-presup .g-fill{ height:100%; width:0; background:var(--blue); }
+  .g-presup .g-fill.over{ background:#D9534F; }
+  .g-estado{ font-size:11.5px; font-weight:700; color:var(--muted); }
+
   /* ---- Gestor de cuadernos ---- */
   .gestor-input{
     width:100%; max-width:280px; padding:12px 14px; border:none;
@@ -584,6 +638,7 @@
       <span class="emoji" id="profIcon">✦</span><span id="profName">Tu nombre</span>
     </button>
     <button class="mini-btn" id="editTasksBtn" title="Configurar tus tareas">Mis tareas</button>
+    <button class="mini-btn" id="gastosBtn" title="Anotar y revisar tus gastos">Gastos</button>
   </div>
 
   <header class="cal-header">
@@ -681,6 +736,40 @@
     <div class="edit-actions">
       <button id="editCloseBtn">Cerrar</button>
       <button id="editSaveBtn">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- Gastos -->
+<div class="overlay" id="gastosOverlay">
+  <div class="overlay-card wide">
+    <h2>Gastos</h2>
+    <p class="edit-hint">Anota lo que gastas y mira c&oacute;mo vas del mes. Se guarda en este dispositivo y, si configuraste Firebase, se sincroniza con tus dem&aacute;s equipos.</p>
+
+    <div class="g-form">
+      <input type="text" id="gConcepto" class="g-concepto" placeholder="Concepto (ej: almuerzo)" maxlength="40">
+      <input type="number" id="gMonto" class="g-monto" placeholder="Monto" min="0" step="0.01" inputmode="decimal">
+      <select id="gCategoria"></select>
+      <button id="gAddBtn">A&ntilde;adir</button>
+    </div>
+
+    <div class="g-resumen">
+      <div class="g-card"><div class="g-label" id="gRotuloDia">HOY</div><div class="g-value" id="gTotalDia">0,00</div></div>
+      <div class="g-card"><div class="g-label">ESTE MES</div><div class="g-value" id="gTotalMes">0,00</div></div>
+      <div class="g-card"><div class="g-label">ANOTACIONES</div><div class="g-value" id="gCantidad">0</div></div>
+    </div>
+
+    <ul class="g-lista" id="gLista"></ul>
+
+    <div class="g-presup">
+      <label for="gPresupuesto">Presupuesto del mes</label>
+      <input type="number" id="gPresupuesto" min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+      <div class="g-track"><div class="g-fill" id="gFill"></div></div>
+      <span class="g-estado" id="gEstadoPresup"></span>
+    </div>
+
+    <div class="edit-actions">
+      <button class="ghost" id="gastosCloseBtn">Cerrar</button>
     </div>
   </div>
 </div>
@@ -831,6 +920,8 @@ function pCustom(p){ return 'mi-cuaderno-custom-'+p; }
 function pRecur(p){ return 'mi-cuaderno-recurring-'+p; }
 function pRecDone(p){ return 'mi-cuaderno-recdone-'+p+'-'; }
 function pTasks(p){ return 'mi-cuaderno-tasks-'+p; }
+function pGastos(p){ return 'mi-cuaderno-gastos-'+p; }
+function pPresup(p){ return 'mi-cuaderno-presupuesto-'+p; }
 
 const DEFAULT_RECURRING = [
   { id:'reniec', label:'RENIEC (trámites)', weekdays:[1], time:'13:00–17:00', section:'trabajo' }
@@ -842,6 +933,7 @@ let baseStore = {};    // date -> { secId: { taskId: bool } }
 let custom = [];       // [{id,text,section,date,done}]
 let recurring = [];
 let recurDone = {};    // date -> { recId: bool }
+let gastos = [];       // [{id,concepto,monto,categoria,date}]
 
 function loadCustom(){ try{ const r=localStorage.getItem(pCustom(profile)); if(r) return JSON.parse(r); }catch(e){} return []; }
 function saveCustom(){ try{ localStorage.setItem(pCustom(profile), JSON.stringify(custom)); }catch(e){} }
@@ -849,6 +941,10 @@ function loadSections(){ try{ const r=localStorage.getItem(pTasks(profile)); if(
 function saveSections(){ try{ localStorage.setItem(pTasks(profile), JSON.stringify(sections)); }catch(e){} }
 function loadRecurring(){ try{ const r=localStorage.getItem(pRecur(profile)); if(r) return JSON.parse(r); }catch(e){} return DEFAULT_RECURRING.slice(); }
 function saveRecurring(){ try{ localStorage.setItem(pRecur(profile), JSON.stringify(recurring)); }catch(e){} }
+function loadGastos(){ try{ const r=localStorage.getItem(pGastos(profile)); if(r){ const a=JSON.parse(r); return Array.isArray(a)?a:[]; } }catch(e){} return []; }
+function saveGastos(){ try{ localStorage.setItem(pGastos(profile), JSON.stringify(gastos)); }catch(e){} }
+function loadPresupuesto(){ try{ const r=localStorage.getItem(pPresup(profile)); if(r) return Number(r)||0; }catch(e){} return 0; }
+function savePresupuesto(v){ try{ localStorage.setItem(pPresup(profile), String(v||0)); }catch(e){} }
 
 function loadBase(key){
   let raw=null;
@@ -940,7 +1036,7 @@ function setSyncStatus(ok){
 }
 function syncPush(){
   if(!db || !remoteReady) return;
-  const data = { base: baseStore, custom: custom, recurring: recurring, recurringDone: recurDone, models: { sections: sections } };
+  const data = { base: baseStore, custom: custom, recurring: recurring, recurringDone: recurDone, gastos: gastos, models: { sections: sections } };
   const json = JSON.stringify(data);
   if(json === JSON.stringify(remoteData)) return;
   remoteData = data;
@@ -974,6 +1070,7 @@ function syncSetup(){
           });
         }
         if(Array.isArray(v.custom)){ custom=v.custom; saveCustom(); }
+    if(Array.isArray(v.gastos)){ gastos=v.gastos; saveGastos(); }
         if(Array.isArray(v.recurring)){ recurring=v.recurring; }
         if(v.recurringDone && typeof v.recurringDone==='object'){
           Object.keys(v.recurringDone).forEach(k=>{ recurDone[k]=v.recurringDone[k]; saveRecDone(k); });
@@ -1099,8 +1196,114 @@ function updateProgress(){
 }
 
 /* ============================================================
+   GASTOS
+   ============================================================ */
+const MONEDA = 'S/';
+const CATEGORIAS_GASTO = ['Comida','Transporte','Casa','Salud','Ocio','Estudio','Otros'];
+
+/* Acepta "8.999" (milésima), "8,999" (milésima), "8.99" y "8,99" (decimales). */
+function parseMonto(valor){
+  const crudo = String(valor == null ? '' : valor);
+  const neg = crudo.trim().charAt(0) === '-';
+  let s = crudo.replace(/[^\d.,]/g, '');
+  if(!s) return 0;
+  const ultimo = Math.max(s.lastIndexOf(','), s.lastIndexOf('.'));
+  if(ultimo > -1){
+    const cabeza = s.slice(0, ultimo).replace(/[.,]/g, '');
+    const cola = s.slice(ultimo + 1);
+    s = cabeza + (cola.length === 3 ? cola : (cola ? '.' + cola : ''));
+  }
+  const n = parseFloat(s);
+  if(isNaN(n)) return 0;
+  return neg ? -n : n;
+}
+function fmtMonto(n){
+  const abs = Math.abs(parseMonto(n));
+  const parts = abs.toFixed(2).split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (parseMonto(n) < 0 ? '-' : '') + MONEDA + ' ' + parts[0] + ',' + parts[1];
+}
+function gastosDeDia(date){ return gastos.filter(g=>g.date===date); }
+function totalDe(lista){ return lista.reduce((s,g)=>s + (Number(g.monto)||0), 0); }
+function mesDe(date){ return String(date||'').slice(0,7); }
+
+function renderGastos(){
+  const key = dateKey(viewDate);
+  const delDia = gastosDeDia(key);
+  const delMes = gastos.filter(g=>mesDe(g.date)===mesDe(key));
+  document.getElementById('gRotuloDia').textContent = isTodayView() ? 'HOY' : key.slice(8,10) + '/' + key.slice(5,7);
+  document.getElementById('gTotalDia').textContent = fmtMonto(totalDe(delDia)).replace(MONEDA + ' ', '');
+  document.getElementById('gTotalMes').textContent = fmtMonto(totalDe(delMes)).replace(MONEDA + ' ', '');
+  document.getElementById('gCantidad').textContent = String(delDia.length);
+
+  const lista = document.getElementById('gLista');
+  lista.innerHTML = '';
+  if(!delDia.length){
+    lista.innerHTML = '<li class="g-vacio">Sin gastos anotados para este d&iacute;a.</li>';
+  } else {
+    delDia.slice().reverse().forEach(g=>{
+      const li = document.createElement('li');
+      li.innerHTML =
+        '<span class="g-cat">' + esc(g.categoria || 'Otros') + '</span>' +
+        '<span class="g-concepto-txt">' + esc(g.concepto || 'Sin concepto') + '</span>' +
+        '<span class="g-monto-txt">' + fmtMonto(g.monto) + '</span>' +
+        '<button class="g-borrar" title="Borrar gasto" data-id="' + g.id + '">&times;</button>';
+      lista.appendChild(li);
+    });
+  }
+
+  const presupuesto = loadPresupuesto();
+  const totalMes = totalDe(delMes);
+  const fill = document.getElementById('gFill');
+  const estado = document.getElementById('gEstadoPresup');
+  if(presupuesto > 0){
+    const pct = Math.min(100, totalMes / presupuesto * 100);
+    fill.style.width = pct + '%';
+    fill.classList.toggle('over', totalMes > presupuesto);
+    estado.textContent = fmtMonto(Math.max(0, presupuesto - totalMes)) + ' disponibles';
+  } else {
+    fill.style.width = '0%';
+    fill.classList.remove('over');
+    estado.textContent = 'pon uno para ver tu margen';
+  }
+}
+
+function openGastos(){
+  renderGastos();
+  document.getElementById('gastosOverlay').classList.add('show');
+  document.getElementById('gPresupuesto').value = loadPresupuesto() || '';
+  document.getElementById('gConcepto').focus();
+}
+function closeGastos(){
+  document.getElementById('gastosOverlay').classList.remove('show');
+}
+
+function addGasto(){
+  const concepto = document.getElementById('gConcepto').value.trim();
+  const monto = Math.round(parseMonto(document.getElementById('gMonto').value) * 100) / 100;
+  const categoria = document.getElementById('gCategoria').value || 'Otros';
+  if(!concepto){ showToast('Escribe el concepto del gasto'); document.getElementById('gConcepto').focus(); return; }
+  if(!(monto > 0)){ showToast('Escribe un monto mayor que 0'); document.getElementById('gMonto').focus(); return; }
+  gastos.push({ id:'g'+nid(), concepto:concepto, monto:monto, categoria:categoria, date:dateKey(viewDate) });
+  saveGastos(); syncPush(); renderGastos();
+  document.getElementById('gConcepto').value = '';
+  document.getElementById('gMonto').value = '';
+  document.getElementById('gConcepto').focus();
+  showToast('Gasto anotado');
+}
+function delGasto(id){
+  gastos = gastos.filter(g=>g.id!==id);
+  saveGastos(); syncPush(); renderGastos();
+}
+function setPresupuesto(){
+  const v = Math.max(0, Math.round(parseMonto(document.getElementById('gPresupuesto').value) * 100) / 100 || 0);
+  savePresupuesto(v);
+  renderGastos();
+}
+
+/* ============================================================
    ACCIONES
-============================================================ */
+   ============================================================ */
 function handleTaskClick(t,row,e){
   if(!isTodayView()){ showToast('Marcar "realizado" solo es para el día de hoy'); return; }
   if(t.base) toggleBase(t.sec,t.tid,e);
@@ -1317,6 +1520,29 @@ function buildEditPanel(){
 }
 
 document.getElementById('editTasksBtn').addEventListener('click', openEdit);
+
+/* ---- Gastos: listeners ---- */
+(function initGastos(){
+  const sel = document.getElementById('gCategoria');
+  CATEGORIAS_GASTO.forEach(c=>{
+    const o = document.createElement('option');
+    o.value = c; o.textContent = c;
+    sel.appendChild(o);
+  });
+  document.getElementById('gastosBtn').addEventListener('click', openGastos);
+  document.getElementById('gastosCloseBtn').addEventListener('click', closeGastos);
+  document.getElementById('gastosOverlay').addEventListener('click', e=>{
+    if(e.target && e.target.id === 'gastosOverlay') closeGastos();
+  });
+  document.getElementById('gAddBtn').addEventListener('click', addGasto);
+  document.getElementById('gMonto').addEventListener('keydown', e=>{ if(e.key === 'Enter') addGasto(); });
+  document.getElementById('gConcepto').addEventListener('keydown', e=>{ if(e.key === 'Enter') addGasto(); });
+  document.getElementById('gLista').addEventListener('click', e=>{
+    const btn = e.target.closest ? e.target.closest('.g-borrar') : null;
+    if(btn) delGasto(btn.getAttribute('data-id'));
+  });
+  document.getElementById('gPresupuesto').addEventListener('change', setPresupuesto);
+})();
 document.getElementById('editCloseBtn').addEventListener('click', closeEdit);
 document.getElementById('addSectionBtn').addEventListener('click', ()=>{
   const name=document.getElementById('newSectionName').value.trim();
@@ -1361,6 +1587,7 @@ function selectNotebook(code){
   sections=loadSections();
   custom=loadCustom();
   recurring=loadRecurring();
+  gastos=loadGastos();
   baseStore={}; recurDone={};
   applyTheme();
   refreshPanelSections();

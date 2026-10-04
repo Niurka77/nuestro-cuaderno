@@ -1,6 +1,6 @@
 # Nuestro Cuaderno
 
-**Agenda y planificador personal instalable (PWA), en español, sin servidor propio y con sincronización entre tus dispositivos.**
+**Agenda, planificador y control de gastos personal, instalable (PWA), en español, sin servidor propio y con sincronización entre tus dispositivos.**
 
 Un solo archivo HTML, sin dependencias, sin build y sin frameworks: se abre en el navegador, se instala en la pantalla de inicio del celular o del computador y funciona aunque no tengas internet. Los datos se guardan en el dispositivo y, si configuras Firebase, se sincronizan solos entre todos tus equipos.
 
@@ -11,6 +11,7 @@ Un solo archivo HTML, sin dependencias, sin build y sin frameworks: se abre en e
 - **Cuadernos múltiples.** Cada persona o proyecto tiene su propio cuaderno: personal, estudio, trabajo, o los que quieras crear.
 - **Secciones y tareas por día de la semana.** Cada tarea se marca para días concretos (por ejemplo: lunes, miércoles y viernes).
 - **Tareas recurrentes.** Rutinas y hábitos que se repiten automáticamente.
+- **Gastos.** Anota lo que gastas (concepto, monto y categoría), mira el total del día y del mes, y ponte un presupuesto mensual con lo que te queda.
 - **Temas visuales.** Cada cuaderno puede usar un estilo distinto (minimal, kawaii, coquette, océano…).
 - **Sincronización entre dispositivos.** Con Firebase Realtime Database: escribes en el celular y lo ves en la computadora al instante.
 - **Instalable (PWA).** Manifest + service worker: se agrega a la pantalla de inicio y abre a pantalla completa, sin barra de navegador.
@@ -80,10 +81,12 @@ Para que tus datos viajen entre el celular y la computadora:
 
 | Qué | Dónde | Para qué |
 |---|---|---|
-| `OWNER_CODE` | `index.html`, línea ~711 | Código de la organizadora: quien lo tiene puede crear y gestionar cuadernos. **Cámbialo.** |
-| `GESTOR_HINT` | `index.html`, línea ~712 | Abre el panel de gestión. **Cámbialo.** |
-| `window.SYNC_KEY` | `firebase-config.js` | Clave de sincronización entre dispositivos. |
+| `OWNER_CODE` | `index.html`, bloque PERFILES | Código de la organizadora: quien lo tiene puede crear y gestionar cuadernos. **Cámbialo.** |
+| `GESTOR_HINT` | `index.html`, bloque PERFILES | Abre el panel de gestión. **Cámbialo.** |
+| `MONEDA` | `index.html`, bloque GASTOS | Símbolo de la moneda (`S/`). Cámbialo por `$`, `€`, `MXN$`... |
+| `CATEGORIAS_GASTO` | `index.html`, bloque GASTOS | Las categorías del gasto. Edita o agrega las tuyas. |
 | `window.FIREBASE_CONFIG` | `firebase-config.js` (copia de `firebase-config.ejemplo.js`) | Datos de tu proyecto de Firebase. |
+| `window.SYNC_KEY` | `firebase-config.js` | Clave de sincronización: la misma en todos tus dispositivos. |
 | Cuadernos iniciales | `index.html`, función `defaultNotebooks()` | Los cuadernos que se crean la primera vez. |
 | Colores y temas | `index.html`, objeto `THEMES` | Paletas de cada tema. |
 
